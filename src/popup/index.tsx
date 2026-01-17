@@ -1,11 +1,17 @@
 import { NavButton } from "@/components/nav-button"
 
+import { SidePanelProvider } from "../context/SidePanelContext"
+
+import "../../style.css"
+
 function IndexPopup() {
   return (
-    <div>
-      <NavButton target="newtab" />
-      <NavButton target="sidepanel" />
-    </div>
+    <SidePanelProvider>
+      <div>
+        <NavButton target="newtab" />
+        <NavButton target="sidepanel" />
+      </div>
+    </SidePanelProvider>
   )
 }
 

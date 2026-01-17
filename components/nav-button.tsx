@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ArrowRight, ExternalLink, PanelRight } from "lucide-react";
 import * as React from "react";
+import { useContext } from "react";
+import {SidePanelContext} from "../src/context/SidePanelContext";
 
 
 
@@ -64,26 +66,14 @@ const navigationConfig: Record<
         const url = chrome.runtime.getURL("tabs/user-form.html")
         await chrome.tabs.create({ url })
       }
+      
     }
   },
   sidepanel: {
     label: "Open Side Panel",
     icon: PanelRight,
     action: async () => {
-      // Open the extension's side panel
-      if (typeof chrome !== "undefined" && chrome.sidePanel) {
-        try {
-          const tabs = await chrome.tabs.query({
-            active: true,
-            currentWindow: true
-          })
-          if (tabs[0]?.windowId) {
-            await chrome.sidePanel.open({ windowId: tabs[0].windowId })
-          }
-        } catch (error) {
-          console.error("Failed to open side panel:", error)
-        }
-      }
+      // Handled by SidePanelContext toggle
     }
   }
 }
@@ -116,16 +106,26 @@ export const NavButton = React.forwardRef<HTMLButtonElement, NavButtonProps>(
   ) => {
     const config = navigationConfig[target]
     const Icon = config.icon
+    const sidePanelContext = useContext(SidePanelContext)
+    const isOpen = sidePanelContext?.isOpen || false
+
     const buttonLabel = label || config.label
+    const displayLabel = target === "sidepanel" && isOpen
+      ? "Close Side Panel"
+      : buttonLabel
 
     const handleClick = React.useCallback(async () => {
       try {
-        await config.action()
+        if (target === "sidepanel" && sidePanelContext) {
+          await sidePanelContext.toggle()
+        } else {
+          await config.action()
+        }
         onNavigate?.(target)
       } catch (error) {
         console.error(`Failed to navigate to ${target}:`, error)
       }
-    }, [target, onNavigate])
+    }, [target, onNavigate, sidePanelContext])
 
     return (
       <Button
@@ -139,7 +139,7 @@ export const NavButton = React.forwardRef<HTMLButtonElement, NavButtonProps>(
         {showIcon && iconPosition === "left" && (
           <Icon className="h-4 w-4" aria-hidden="true" />
         )}
-        <span>{buttonLabel}</span>
+        <span>{displayLabel}</span>
         {showIcon && iconPosition === "right" && (
           <Icon className="h-4 w-4" aria-hidden="true" />
         )}

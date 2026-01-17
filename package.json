@@ -35,7 +35,7 @@
     "@plasmohq/rps": "1.8.7",
     "@plasmohq/storage": "1.15.0",
     "@tailwindcss/postcss": "^4.1.18",
-    "@types/chrome": "0.0.258",
+    "@types/chrome": "0.1.33",
     "@types/node": "20.11.5",
     "@types/react": "18.2.48",
     "@types/react-dom": "18.2.18",
@@ -51,7 +51,9 @@
       "https://*/*"
     ],
     "permissions": [
-      "tabs"
+      "tabs",
+      "storage",
+      "sidePanel"
     ]
   }
 }
