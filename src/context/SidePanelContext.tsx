@@ -1,11 +1,25 @@
-import { createContext, useCallback, useContext, useEffect, useState } from "react"
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState
+} from "react"
+
+import { Storage } from "@plasmohq/storage"
 
 interface SidePanelContextValue {
   isOpen: boolean
   toggle: () => Promise<void>
 }
 
-export const SidePanelContext = createContext<SidePanelContextValue | null>(null)
+export const SidePanelContext = createContext<SidePanelContextValue | null>(
+  null
+)
+
+const storage = new Storage({
+  area: "local"
+})
 
 export function SidePanelProvider({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(false)
@@ -20,10 +34,10 @@ export function SidePanelProvider({ children }: { children: React.ReactNode }) {
     const windowId = tabs[0]?.windowId
     if (!windowId) return
 
-    const currentState = await chrome.storage.local.get("sidePanelOpen")
-    const newState = !currentState.sidePanelOpen
+    const currentState = await storage.get("sidePanelOpen")
+    const newState = !currentState
 
-    await chrome.storage.local.set({ sidePanelOpen: newState })
+    await storage.set("sidePanelOpen", newState)
 
     if (newState === true) {
       await chrome.sidePanel.open({ windowId })
